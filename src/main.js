@@ -1,16 +1,14 @@
 import React from 'react';
-import {Grommet, Box, DataTable, Meter, Text} from 'grommet';
+import {Box, DataTable, Text} from 'grommet';
 import {AppWrapper} from './components';
-import {grommet} from 'grommet/themes';
 
 
 export default function Main() {
     const columns = [
         {
-            property: 'name',
+            property: 'username',
             header: <Text>Имя пользователя</Text>,
             primary: true,
-            footer: 'Total',
         },
         {
             property: 'email',
@@ -54,12 +52,11 @@ export default function Main() {
     return (
         <AppWrapper>
             <Box align="center" pad="large">
-                {}
                 <DataTable
                     columns={columns}
                     data={data}
-                    resizeable='true'
-                    sortable='true'
+                    resizeable={true}
+                    sortable={true}
                     // step={10}
                     onClickRow={event => console.log(event.datum)}
                 />

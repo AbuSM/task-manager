@@ -1,6 +1,7 @@
 import React from 'react';
-import Main from './main';
 import {Switch, BrowserRouter, Route} from 'react-router-dom';
+import Main from './main';
+import Login from './login';
 
 function App() {
     return (
@@ -8,6 +9,7 @@ function App() {
             <div className="App">
                 <Switch>
                     <Route path="/" component={Main} exact/>
+                    <Route path="/login" component={Login} exact/>
                 </Switch>
             </div>
         </BrowserRouter>

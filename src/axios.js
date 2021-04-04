@@ -1,16 +1,17 @@
 import axs from 'axios';
-import {getItem} from 'helpers';
 
 export {CancelToken} from 'axios';
 
 export const axios = axs.create({
-    baseURL: 'https://uxcandy.com/~shapoval/test-task-backend/v2/?developer=Fattoh',
+    baseURL: 'http://uxcandy.com/~shapoval/test-task-backend/v2/',
 });
 
 axios.defaults.headers.common['Accept-Language'] = 'ru';
 
 axios.interceptors.request.use(function (config) {
-    const user_session = getItem(USER_SESSION);
+    // const user_session = getItem(USER_SESSION);
+    const user_session = '';
+    config.params = {developer: 'Fattoh'};
 
     if (user_session) {
         config.headers['Authorization'] = `Bearer ${user_session}`;

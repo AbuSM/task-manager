@@ -1,6 +1,12 @@
 import {axios} from '../axios';
 
 
-export const getTasks = async () => (
+const getTasks = async () => (
     axios.get('')
-)
+);
+
+const login = async (data) => (
+    axios.post('/login/', data)
+);
+
+export {getTasks, login};
