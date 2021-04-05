@@ -9,4 +9,12 @@ const login = async (data) => (
     axios.post('/login/', data)
 );
 
-export {getTasks, login};
+const createTask = async (data) => (
+    axios.post('/create/', data)
+);
+
+const editTask = async (data, id) => (
+    axios.post(`/edit/${id}`)
+);
+
+export {getTasks, login, createTask, editTask};

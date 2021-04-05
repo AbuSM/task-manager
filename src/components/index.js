@@ -1,19 +1,25 @@
 import React from 'react';
-import {Button, Grommet, grommet, Header as HeaderLib, Menu, RoutedButton} from 'grommet';
-import {Icons} from 'grommet-icons/icons';
+import {Button, Grommet, grommet, Header as HeaderLib, Menu} from 'grommet';
+import {useSelector} from 'react-redux';
 
 
-const AppWrapper = (props) => (
-    <Grommet theme={grommet}>
-        <HeaderLib background="brand">
-            <RoutedButton label="Login" path="/login" />
-            {/*<Button icon={<Icons.Home />} hoverIndicator />*/}
-            <Menu label="account" items={[{ label: 'logout' }]} />
-        </HeaderLib>
-        {props.children}
-    </Grommet>
+const AppWrapper = (props) => {
+    const {logged} = useSelector(state => state.loginReducer);
 
-);
+    return (
+        <Grommet theme={grommet}>
+            <HeaderLib background="brand" justify="end" height="xxsmall" pad="medium">
+                {!logged ?
+                    <Button label="Login" path="/login"/>
+                    :
+                    <Menu label = "account" items={[{label: 'logout'}]} />
+                }
+            </HeaderLib>
+            {props.children}
+        </Grommet>
+
+    );
+};
 
 
 export {AppWrapper}
