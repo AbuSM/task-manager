@@ -1,12 +1,12 @@
 import {axios} from '../axios';
 
 
-const getTasks = async () => (
-    axios.get('')
+const getTasks = async (params) => (
+    axios.get('', {params})
 );
 
 const login = async (data) => (
-    axios.post('/login/', data)
+    axios.post('/login/', data, {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
 );
 
 const createTask = async (data) => (
@@ -14,7 +14,7 @@ const createTask = async (data) => (
 );
 
 const editTask = async (data, id) => (
-    axios.post(`/edit/${id}`)
+    axios.post(`/edit/${id}`,)
 );
 
 export {getTasks, login, createTask, editTask};

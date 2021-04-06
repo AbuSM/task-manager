@@ -4,7 +4,6 @@ import {
     LOGIN_FAILURE
 } from '../constants';
 import {login} from '../api';
-import {useCookies} from 'react-cookie';
 
 export const auth = (data) => async dispatch => {
     // const [cookies, setCookie] = useCookies(['token']);

@@ -6,18 +6,23 @@ export const axios = axs.create({
     baseURL: 'https://uxcandy.com/~shapoval/test-task-backend/v2/',
 });
 
-axios.defaults.headers.common['Accept-Language'] = 'ru';
+// axios.defaults.headers.common['Accept-Language'] = 'ru';
 
 axios.interceptors.request.use(function (config) {
     // const user_session = getItem(USER_SESSION);
-    const user_session = '';
-    config.params = {developer: 'Fattoh'};
-
-    if (user_session) {
-        config.headers['Authorization'] = `Bearer ${user_session}`;
-    } else {
-        config.headers['Authorization'] = '';
+    const user_session = localStorage.getItem('token');
+    if (config.data) {
+        const formData = new FormData();
+        const data = config.data;
+        Object.keys(data).forEach(item => formData.append(item, data[item]));
+        if (user_session) {
+            formData.token = user_session
+        }
+        config.data = formData
     }
+
+    config.params = {...config.params, developer: 'Fattoh'};
+    config.headers['Content-Type'] = 'multipart/form-data';
 
     return config;
 }, function (error) {

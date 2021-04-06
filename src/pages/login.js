@@ -1,17 +1,20 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Grommet, Box, Form, FormField, TextInput, Text, Spinner, Button} from 'grommet';
 import {grommet} from 'grommet/themes';
 import {auth} from '../actions';
 import {useDispatch, useSelector} from 'react-redux';
 
 export default function Login() {
-    const [value, setValue] = React.useState({username: '', password: ''});
+    const [value, setValue] = useState({username: '', password: ''});
+    const [errors, setErrors] = useState({});
     const dispatch = useDispatch();
     const {loading, err} = useSelector(state => state.loginReducer);
 
     const handleSubmit = (data) => {
         const {value} = data;
-        dispatch(auth(value))
+        dispatch(auth(value)).then(res => {
+            localStorage.setItem('token', res.token)
+        });
     };
 
     return (
