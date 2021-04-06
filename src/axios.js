@@ -3,7 +3,7 @@ import axs from 'axios';
 export {CancelToken} from 'axios';
 
 export const axios = axs.create({
-    baseURL: 'http://uxcandy.com/~shapoval/test-task-backend/v2/',
+    baseURL: 'https://uxcandy.com/~shapoval/test-task-backend/v2/',
 });
 
 axios.defaults.headers.common['Accept-Language'] = 'ru';
@@ -25,7 +25,11 @@ axios.interceptors.request.use(function (config) {
 });
 
 axios.interceptors.response.use(function (response) {
-    return response.data;
+    const {data} = response || {};
+    if (data?.status === 'error') {
+        return Promise.reject(data?.message);
+    }
+    return data?.message;
 }, function (error) {
     return Promise.reject(error);
 });

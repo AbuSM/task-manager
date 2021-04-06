@@ -2,7 +2,7 @@ import React from 'react';
 import {Box, DataTable, Text, Button, Card, CardBody, Layer, Form, FormField, TextInput} from 'grommet';
 import {AppWrapper} from '../components';
 import {useSelector} from 'react-redux';
-import {createTask, editTask} from '../api';
+import {createTask, editTask, getTasks} from '../api';
 
 export default function Main() {
     const [data, setData] = React.useState([]);
@@ -37,6 +37,16 @@ export default function Main() {
 
     ];
 
+    React.useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = () => {
+        getTasks().then(res => {
+            setData(res?.tasks);
+        })
+    };
+
     const data_ = [
         {
             'id': 1,
@@ -66,11 +76,14 @@ export default function Main() {
 
     const handleSubmit = data => {
         const {value} = data;
-        console.log(value);
         if (modal.edit) {
-            editTask(value).then(console.log);
+            editTask(value).then(() => {
+                fetchData();
+            });
         } else {
-            createTask(value).then(console.log);
+            createTask(value).then(res => {
+                setData([...data, ...res])
+            });
         }
     };
 
@@ -81,7 +94,7 @@ export default function Main() {
             <Box justify="center" pad="medium">
                 <DataTable
                     columns={columns}
-                    data={data_}
+                    data={data}
                     resizeable
                     sortable
                     step={3}
@@ -114,7 +127,7 @@ export default function Main() {
                                 }
                                 <Box direction="row" gap="medium" justify="center">
                                     <Button type="reset" label="Отмена" onClick={() => setModal(false)}/>
-                                    <Button type="submit" primary label={modal.edit ? 'Редактировать': 'Создать'}/>
+                                    <Button type="submit" primary label={modal.edit ? 'Редактировать' : 'Создать'}/>
                                 </Box>
                             </Form>
                         </CardBody>
