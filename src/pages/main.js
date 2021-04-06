@@ -120,7 +120,14 @@ export default function Main() {
                     });
                     fetchData();
                 })
-                .catch(err => dispatch({type: ACTION_ERRORS, payload: err}))
+                .catch(err => {
+                    dispatch({type: ACTION_ERRORS, payload: err});
+                    handleCloseModal();
+                    addToast('Пожалуйста авторизуйтесь!', {
+                        appearance: 'warning',
+                        autoDismiss: true
+                    });
+                })
         } else {
             createTask(value)
                 .then(res => {
