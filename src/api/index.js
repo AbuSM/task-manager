@@ -14,7 +14,7 @@ const createTask = async (data) => (
 );
 
 const editTask = async (data, id) => (
-    axios.post(`/edit/${id}`,)
+    axios.post(`/edit/${id}`, data)
 );
 
 export {getTasks, login, createTask, editTask};

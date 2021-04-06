@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useEffect, useCallback} from 'react';
 import {
     Box,
     DataTable,
@@ -10,7 +10,6 @@ import {
     Form,
     FormField,
     TextInput,
-    Select,
     Pagination,
     Spinner
 } from 'grommet';
@@ -29,26 +28,25 @@ import {
 const statuses = [
     {
         label: 'Не выполнена',
-        value: 0
+        value: '0'
     },
     {
         label: 'Не выполнена, отредактирована админом',
-        value: 1
+        value: '1'
     },
     {
         label: 'Выполнена',
-        value: 10
+        value: '10'
     },
     {
         label: 'Выполнена и отредактирована админом',
-        value: 11
+        value: '11'
     }
 ];
 
 export default function Main() {
     const dispatch = useDispatch();
     const {logged} = useSelector(state => state.loginReducer);
-    console.log(logged);
     const state = useSelector(state => state.mainReducer);
     const {addToast} = useToasts();
 
@@ -68,20 +66,28 @@ export default function Main() {
         {
             property: 'status',
             header: 'Статус задачи',
+            render: ({status}) => getStatus(status)
         },
         {
             property: 'id',
             header: <Button primary label="Создать задачу"
                             onClick={() => dispatch({type: ACTION_MODAL, payload: {show: true}})}/>,
             sortable: false,
-            render: data => <Button secondary={true} color="yellow" label="Редактировать задачу"
-                                    onClick={() => dispatch({
-                                        type: ACTION_MODAL,
-                                        payload: {show: true, edit: true, data}
-                                    })}/>
+            render: data => logged && <Button secondary={true} color="yellow" label="Редактировать задачу"
+                                              onClick={() => dispatch({
+                                                  type: ACTION_MODAL,
+                                                  payload: {show: true, edit: true, data}
+                                              })}/>
         },
 
     ];
+
+    const getStatus = (status) => {
+        if (logged && status === 0) {
+            return statuses.filter(item => item.value === '10')[0].label
+        }
+        return statuses.filter(item => item.value === String(status))[0].label
+    };
 
     const fetchData = useCallback(() => {
         dispatch({type: FETCH_DATA_REQUEST});
@@ -95,18 +101,26 @@ export default function Main() {
             .finally(() => FETCH_DATA_COMPLETE)
     }, [state.params, dispatch]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    const handleChange = data => console.log(data);
-
     const handleSubmit = data => {
-        const {value} = data;
+        let {value} = data;
         if (state.modal.edit) {
-            editTask(value, state.modal.data.id).then(() => {
-                fetchData();
-            });
+            if (logged) {
+                value.status = 11
+            }
+            editTask(value, state.modal.data.id)
+                .then(() => {
+                    handleCloseModal();
+                    addToast('Запись успешно обновлена!', {
+                        appearance: 'success',
+                        autoDismiss: true
+                    });
+                    fetchData();
+                })
+                .catch(err => dispatch({type: ACTION_ERRORS, payload: err}))
         } else {
             createTask(value)
                 .then(res => {
@@ -147,6 +161,7 @@ export default function Main() {
                             resizeable
                             primaryKey="id"
                             sortable
+                            sort={{property: state.params.sort_field, direction: state.params.sort_direction}}
                             onSort={handleSort}
                         />
                         <Pagination numberItems={Number(state.data?.total_task_count)} margin="0 auto"
@@ -161,7 +176,7 @@ export default function Main() {
                     onClickOutside={handleCloseModal}>
                     <Card width="medium">
                         <CardBody pad="medium">
-                            <Form onSubmit={handleSubmit} errors={state.errors} onChange={handleChange}>
+                            <Form onSubmit={handleSubmit} errors={state.errors}>
                                 {!state.modal.edit &&
                                 <React.Fragment>
                                     <FormField label="Имя пользователя" name="username">
@@ -173,20 +188,12 @@ export default function Main() {
                                 </React.Fragment>
                                 }
                                 <FormField label="Текст задачи" name="text">
-                                    <TextInput type="text" name="text" value={state.modal?.data?.text}/>
+                                    <TextInput type="text" name="text" defaultValue={state.modal?.data?.text}/>
                                 </FormField>
-                                {state.modal.edit &&
-                                <FormField label="Статус задачи" name="status">
-                                    <Select options={statuses}
-                                            labelKey="label"
-                                            valueKey={{key: 'value', reduce: true}}
-                                            defaultValue={state.modal?.data?.status}
-                                            type="select" name="status"/>
-                                </FormField>
-                                }
                                 <Box direction="row" gap="medium" justify="center">
                                     <Button type="reset" label="Отмена" onClick={handleCloseModal}/>
-                                    <Button type="submit" primary label={state.modal.edit ? 'Редактировать' : 'Создать'}/>
+                                    <Button type="submit" primary
+                                            label={state.modal.edit ? 'Редактировать' : 'Создать'}/>
                                 </Box>
                             </Form>
                         </CardBody>

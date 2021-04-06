@@ -1,44 +1,37 @@
-import React, {useState} from 'react';
-import {Grommet, Box, Form, FormField, TextInput, Text, Spinner, Button} from 'grommet';
+import React from 'react';
+import {Grommet, Box, Form, FormField, TextInput, Spinner, Button} from 'grommet';
 import {grommet} from 'grommet/themes';
 import {auth} from '../actions';
 import {useDispatch, useSelector} from 'react-redux';
 
-export default function Login() {
-    const [value, setValue] = useState({username: '', password: ''});
-    const [errors, setErrors] = useState({});
+
+export default function Login({history}) {
+    const {loading, error, logged} = useSelector(state => state.loginReducer);
     const dispatch = useDispatch();
-    const {loading, err} = useSelector(state => state.loginReducer);
 
     const handleSubmit = (data) => {
         const {value} = data;
-        dispatch(auth(value)).then(res => {
-            localStorage.setItem('token', res.token)
-        });
+        dispatch(auth(value))
     };
+
+    if (logged) {
+        history.push('/')
+    }
 
     return (
         <Grommet full theme={grommet}>
             <Box fill align="center" justify="center">
                 <Box width="medium">
                     <Form
-                        value={value}
-                        onChange={nextValue => setValue(nextValue)}
                         onSubmit={handleSubmit}
-                    >
-                        <FormField label="Логин" name="username" required>
+                        errors={error}>
+                        <FormField label="Логин" name="username">
                             <TextInput name="username" type="name"/>
                         </FormField>
 
-                        <FormField label="Пароль" name="password" required>
+                        <FormField label="Пароль" name="password">
                             <TextInput name="password" type="password"/>
                         </FormField>
-
-                        {err && (
-                            <Box pad={{ horizontal: 'small' }}>
-                                <Text color="status-error">{err}</Text>
-                            </Box>
-                        )}
 
                         <Box direction="row" justify="center" margin={{top: 'medium'}}>
                             {loading ?
