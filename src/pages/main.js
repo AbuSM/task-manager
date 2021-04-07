@@ -10,6 +10,7 @@ import {
     Form,
     FormField,
     TextInput,
+    Select,
     Pagination,
     Spinner
 } from 'grommet';
@@ -25,22 +26,38 @@ import {
     ACTION_ERRORS
 } from '../constants';
 
+const NOT_SOLVED = 'Не выполнена';
+const SOLVED = 'Выполнена';
+const NOT_SOLVED_ADMIN = 'Не выполнена, отредактирована админом';
+const SOLVED_ADMIN = 'Выполнена и отредактирована админом';
+
 const statuses = [
     {
-        label: 'Не выполнена',
+        label: NOT_SOLVED,
         value: '0'
     },
     {
-        label: 'Не выполнена, отредактирована админом',
+        label: NOT_SOLVED_ADMIN,
         value: '1'
     },
     {
-        label: 'Выполнена',
+        label: SOLVED,
         value: '10'
     },
     {
-        label: 'Выполнена и отредактирована админом',
+        label: SOLVED_ADMIN,
         value: '11'
+    }
+];
+
+const selectOptions = [
+    {
+        label: NOT_SOLVED,
+        value: '0'
+    },
+    {
+        label: SOLVED,
+        value: '10'
     }
 ];
 
@@ -83,9 +100,6 @@ export default function Main() {
     ];
 
     const getStatus = (status) => {
-        if (logged && status === 0) {
-            return statuses.filter(item => item.value === '10')[0].label
-        }
         return statuses.filter(item => item.value === String(status))[0].label
     };
 
@@ -109,7 +123,11 @@ export default function Main() {
         let {value} = data;
         if (state.modal.edit) {
             if (logged) {
-                value.status = 11
+                if (String(value.status) === '10') {
+                    value.status = '11'
+                } else if (String(value.status) === '0') {
+                    value.status = '1'
+                }
             }
             editTask(value, state.modal.data.id)
                 .then(() => {
@@ -197,6 +215,16 @@ export default function Main() {
                                 <FormField label="Текст задачи" name="text">
                                     <TextInput type="text" name="text" defaultValue={state.modal?.data?.text}/>
                                 </FormField>
+                                {state.modal.edit &&
+                                    <FormField label="Статус задачи" name="status">
+                                        <Select options={selectOptions}
+                                                valueKey={{key: 'value', reduce: true}}
+                                                labelKey="label"
+                                                name="status"
+                                                defaultValue={String(state.modal?.data?.status)}
+                                        />
+                                    </FormField>
+                                }
                                 <Box direction="row" gap="medium" justify="center">
                                     <Button type="reset" label="Отмена" onClick={handleCloseModal}/>
                                     <Button type="submit" primary
